@@ -23,7 +23,6 @@ Enemy.prototype.update = function(dt) {
     // which will ensure the game runs at the same speed for
     // all computers.
     this.x += dt * this.speed;
-    //this.update()
 
 };
 
@@ -43,32 +42,38 @@ var Player = function() {
     this.y = 400;
     this.width = 50;
     this.height = 50;
+    this.score = 0;
+    this.loss = 0;
 
 };
 
 Player.prototype.update = function() {
 
+    //loop through enemies array
 
     presentEnemies.forEach(function(enemy) {
 
-        if (enemy.x < player.x + player.width &&
-            enemy.x + enemy.width > player.x &&
-            enemy.y < player.y + player.height &&
-            enemy.height + enemy.y > player.y) {
+
+        if (enemy.x < this.x + this.width &&
+            enemy.x + this.width > this.x &&
+            enemy.y < this.y + this.height &&
+            enemy.height + enemy.y > this.y) {
             console.log('collision detected');
-            player.x = 200;
-            player.y = 400;
+            this.x = 200;
+            this.y = 400;
+
+            //empty the array to start game over
             allEnemies = [];
-            lose();
+            this.lose();
         }
-    });
+    }.bind(this));
 
-    if (player.y < 50) {
+    if (this.y < 50) {
 
-        player.x = 200;
-        player.y = 400;
+        this.x = 200;
+        this.y = 400;
         allEnemies = [];
-        wins();
+        this.wins();
     }
 };
 
@@ -83,49 +88,43 @@ Player.prototype.render = function() {
 Player.prototype.handleInput = function(key) {
 
     if (key === 'left') {
-        if (player.x - 100 > -50) {
-            player.x -= 100;
+        if (this.x - 100 > -50) {
+            this.x -= 100;
         }
     }
 
     if (key === 'up') {
-
-        player.y -= 85;
-
+        this.y -= 85;
     }
 
     if (key === 'right') {
-        if (player.x + 100 < 500) {
-            player.x += 100;
+        if (this.x + 100 < 500) {
+            this.x += 100;
         }
     }
 
     if (key === 'down') {
-        if (player.y + 85 < 450) {
-            player.y += 85;
+        if (this.y + 85 < 450) {
+            this.y += 85;
         }
     }
 };
 
 //Scoreboard functionality within wins and lose()
 
-score = 0;
-loss = 0;
+Player.prototype.wins = function() {
 
-var wins = function() {
-
-    score += 1;
-
-
+    this.score += 1;
     var element = document.getElementById("wins");
-    element.innerHTML = score;
+    element.innerHTML = this.score;
+
 };
 
-var lose = function() {
+Player.prototype.lose = function() {
 
-    loss += 1;
+    this.loss += 1;
     var element = document.getElementById("lose");
-    element.innerHTML = loss;
+    element.innerHTML = this.loss;
 
 };
 
@@ -134,6 +133,7 @@ var lose = function() {
 allEnemies = [];
 
 //only check collisions with the 10 newest enemies
+
 var presentEnemies;
 
 
@@ -149,19 +149,7 @@ var createEnemies = function() {
     setTimeout(createEnemies, 1500);
 };
 
-
-var moveEnemies = function() {
-
-    allEnemies.forEach(function(enemy) {
-        this.update();
-        player.update();
-    });
-
-};
-
-
 createEnemies();
-
 
 var player = new Player();
 
